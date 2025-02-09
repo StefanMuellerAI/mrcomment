@@ -619,7 +619,7 @@ ${linkedInPost}`
                 <textarea
                   value={linkedInPost}
                   onChange={(e) => setLinkedInPost(e.target.value)}
-                  className="flex-1 w-full resize-none rounded-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
+                  className="flex-1 w-full resize-none rounded-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 mb-2 px-3 py-2"
                   placeholder="Fügen Sie hier den LinkedIn Beitrag ein..."
                 />
                 <div className="mb-4 text-sm">
