@@ -625,7 +625,7 @@ ${linkedInPost}`
                 <div className="flex gap-2">
                   <button
                     onClick={generateComments}
-                    disabled={!customers.some(c => c.selected) || !linkedInPost.trim() || isLoading}
+                    disabled={!customers.some(c => c.selected) || !linkedInPost.trim() || linkedInPost.length < 300 || isLoading}
                     className="flex-1 flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
