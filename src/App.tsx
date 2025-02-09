@@ -3,6 +3,8 @@ import { MessageCircle, User, Copy, Plus, Pencil, Trash, Check, Loader2 } from '
 import { supabase } from './lib/supabase';
 import Logo from './components/Logo';
 import OpenAI from "openai";
+import Footer from './components/Footer';
+import LegalModal from './components/LegalModal';
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_OPENAI_API_KEY,
@@ -57,6 +59,8 @@ function App() {
     linkedin_examples: ["", "", ""]
   });
   const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [showImpressum, setShowImpressum] = useState(false);
+  const [showDatenschutz, setShowDatenschutz] = useState(false);
 
   useEffect(() => {
     // Check initial auth state
@@ -524,7 +528,7 @@ ${linkedInPost}`
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="min-h-screen bg-gray-50 relative flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm fixed w-full z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -547,7 +551,7 @@ ${linkedInPost}`
       </header>
 
       {/* Main Content */}
-      <div className="pt-16">
+      <div className="pt-16 flex-1">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="grid grid-cols-3 gap-6">
             {/* Left Column - Customer Profiles */}
@@ -677,6 +681,12 @@ ${linkedInPost}`
         </div>
       </div>
 
+      {/* Footer */}
+      <Footer
+        onShowImpressum={() => setShowImpressum(true)}
+        onShowDatenschutz={() => setShowDatenschutz(true)}
+      />
+
       {/* Overlay */}
       {showOverlay && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -804,6 +814,82 @@ ${linkedInPost}`
             </div>
           </div>
         </div>
+      )}
+
+      {/* Impressum Modal */}
+      {showImpressum && (
+        <LegalModal
+          title="Impressum"
+          onClose={() => setShowImpressum(false)}
+          content={
+            <div>
+              <h3>Angaben gemäß § 5 TMG</h3>
+              <p>
+                Stefan Müller<br />
+                Schönbornstraße 45<br />
+                97332 Volkach
+              </p>
+
+              <h3 className="mt-4">Kontakt</h3>
+              <p>
+                Telefon: +49 151 70133065<br />
+                E-Mail: info@stefanai.de
+              </p>
+
+              <h3 className="mt-4">Umsatzsteuer-ID</h3>
+              <p>
+                Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br />
+                DE358661667
+              </p>
+
+              <h3 className="mt-4">Redaktionell verantwortlich</h3>
+              <p>
+                Stefan Müller<br />
+                Schönbornstraße 45<br />
+                97332 Volkach
+              </p>
+            </div>
+          }
+        />
+      )}
+
+      {/* Datenschutz Modal */}
+      {showDatenschutz && (
+        <LegalModal
+          title="Datenschutzerklärung"
+          onClose={() => setShowDatenschutz(false)}
+          content={
+            <div>
+              <h3>1. Datenschutz auf einen Blick</h3>
+              <h4 className="mt-4">Allgemeine Hinweise</h4>
+              <p>
+                Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können. Ausführliche Informationen zum Thema Datenschutz entnehmen Sie unserer unter diesem Text aufgeführten Datenschutzerklärung.
+              </p>
+
+              <h4 className="mt-4">Datenerfassung auf dieser Website</h4>
+              <p>
+                <strong>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</strong><br />
+                Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Impressum dieser Website entnehmen.
+              </p>
+
+              <h4 className="mt-4">Wie erfassen wir Ihre Daten?</h4>
+              <p>
+                Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z. B. um Daten handeln, die Sie in ein Kontaktformular eingeben.
+                Andere Daten werden automatisch oder nach Ihrer Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst. Das sind vor allem technische Daten (z. B. Internetbrowser, Betriebssystem oder Uhrzeit des Seitenaufrufs).
+              </p>
+
+              <h4 className="mt-4">Wofür nutzen wir Ihre Daten?</h4>
+              <p>
+                Ein Teil der Daten wird erhoben, um eine fehlerfreie Bereitstellung der Website zu gewährleisten. Andere Daten können zur Analyse Ihres Nutzerverhaltens verwendet werden.
+              </p>
+
+              <h4 className="mt-4">Welche Rechte haben Sie bezüglich Ihrer Daten?</h4>
+              <p>
+                Sie haben jederzeit das Recht, unentgeltlich Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu erhalten. Sie haben außerdem ein Recht, die Berichtigung oder Löschung dieser Daten zu verlangen. Wenn Sie eine Einwilligung zur Datenverarbeitung erteilt haben, können Sie diese Einwilligung jederzeit für die Zukunft widerrufen. Außerdem haben Sie das Recht, unter bestimmten Umständen die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen.
+              </p>
+            </div>
+          }
+        />
       )}
     </div>
   );
