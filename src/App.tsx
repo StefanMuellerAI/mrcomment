@@ -619,9 +619,20 @@ ${linkedInPost}`
                 <textarea
                   value={linkedInPost}
                   onChange={(e) => setLinkedInPost(e.target.value)}
-                  className="flex-1 w-full resize-none rounded-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 mb-6 px-3 py-2"
+                  className="flex-1 w-full resize-none rounded-md border border-gray-300 focus:border-blue-500 focus:ring-blue-500 mb-2"
                   placeholder="Fügen Sie hier den LinkedIn Beitrag ein..."
                 />
+                <div className="mb-4 text-sm">
+                  {!customers.some(c => c.selected) ? (
+                    <p className="text-amber-600">Bitte wählen Sie zuerst ein Kundenprofil aus.</p>
+                  ) : !linkedInPost.trim() ? (
+                    <p className="text-amber-600">Bitte fügen Sie einen LinkedIn Beitrag hinzu.</p>
+                  ) : linkedInPost.length < 300 ? (
+                    <p className="text-amber-600">Der LinkedIn Beitrag muss mindestens 300 Zeichen lang sein (aktuell: {linkedInPost.length} Zeichen).</p>
+                  ) : (
+                    <p className="text-green-600">Alles bereit! Sie können jetzt Kommentare generieren.</p>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <button
                     onClick={generateComments}
