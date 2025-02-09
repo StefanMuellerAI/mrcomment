@@ -40,6 +40,7 @@ function App() {
     password: ''
   });
   const [loginError, setLoginError] = useState('');
+  const [userEmail, setUserEmail] = useState<string>('');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [linkedInPost, setLinkedInPost] = useState("");
   const [generatedComments, setGeneratedComments] = useState<GeneratedComment[]>([]);
@@ -63,6 +64,7 @@ function App() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setIsLoggedIn(true);
+        setUserEmail(session.user.email || '');
         fetchCustomers();
       }
     };
@@ -73,9 +75,11 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setIsLoggedIn(true);
+        setUserEmail(session.user.email || '');
         fetchCustomers();
       } else {
         setIsLoggedIn(false);
+        setUserEmail('');
         setCustomers([]);
       }
     });
@@ -131,6 +135,7 @@ function App() {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setIsLoggedIn(false);
+      setUserEmail('');
       setCustomers([]);
     } catch (error) {
       console.error('Error signing out:', error);
@@ -509,6 +514,9 @@ ${linkedInPost}`
             <div className="flex items-center">
               <Logo className="h-8 w-8" />
               <h1 className="text-xl font-semibold text-gray-900 ml-2">Mr. Comment</h1>
+            </div>
+            <div className="text-sm text-gray-600">
+              {userEmail}
             </div>
             <button
               onClick={handleLogout}
