@@ -169,6 +169,21 @@ function App() {
     setShowOverlay(true);
   };
 
+  const addLinkedInExample = () => {
+    setFormData(prev => ({
+      ...prev,
+      linkedin_examples: [...prev.linkedin_examples, ""]
+    }));
+  };
+
+  const removeLinkedInExample = (indexToRemove: number) => {
+    if (formData.linkedin_examples.length <= 3) return;
+    setFormData(prev => ({
+      ...prev,
+      linkedin_examples: prev.linkedin_examples.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
   const generateStyleAnalysis = async (examples: string[]): Promise<string> => {
     try {
       const response = await openai.chat.completions.create({
@@ -214,6 +229,9 @@ function App() {
     const errors: string[] = [];
     if (!formData.name.trim()) {
       errors.push("Bitte geben Sie einen Namen ein");
+    }
+    if (formData.linkedin_examples.length < 3) {
+      errors.push("Bitte fügen Sie mindestens drei LinkedIn Beispiele hinzu");
     }
     if (!formData.linkedin_examples.every(ex => ex.trim())) {
       errors.push("Bitte füllen Sie alle LinkedIn Beispiele aus");
@@ -695,19 +713,37 @@ ${linkedInPost}`
                   </label>
                   <div className="space-y-2">
                     {formData.linkedin_examples.map((example, index) => (
-                      <textarea
-                        key={index}
-                        value={example}
-                        onChange={(e) => {
-                          const newExamples = [...formData.linkedin_examples];
-                          newExamples[index] = e.target.value;
-                          setFormData({ ...formData, linkedin_examples: newExamples });
-                        }}
-                        className="w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-24 px-3 py-2"
-                        placeholder={`LinkedIn Beispiel ${index + 1}`}
-                        required
-                      />
+                      <div key={index} className="flex gap-2">
+                        <textarea
+                          value={example}
+                          onChange={(e) => {
+                            const newExamples = [...formData.linkedin_examples];
+                            newExamples[index] = e.target.value;
+                            setFormData({ ...formData, linkedin_examples: newExamples });
+                          }}
+                          className="flex-1 rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 h-24 px-3 py-2"
+                          placeholder={`LinkedIn Beispiel ${index + 1}`}
+                          required
+                        />
+                        {index >= 3 && (
+                          <button
+                            onClick={() => removeLinkedInExample(index)}
+                            className="self-start p-2 text-red-500 hover:text-red-700"
+                            type="button"
+                          >
+                            <Trash className="h-5 w-5" />
+                          </button>
+                        )}
+                      </div>
                     ))}
+                    <button
+                      onClick={addLinkedInExample}
+                      type="button"
+                      className="mt-2 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Weiteres Beispiel hinzufügen
+                    </button>
                   </div>
                 </div>
               </div>
