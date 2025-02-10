@@ -93,9 +93,17 @@ function App() {
 
   const fetchCustomers = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('No user found');
+        return;
+      }
+
       const { data, error } = await supabase
         .from('customers')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -215,7 +223,7 @@ function App() {
         response_format: {
           "type": "text"
         },
-        reasoning_effort: "medium"
+        reasoning_effort: "high"
       });
 
       return response.choices[0].message.content || '';
@@ -250,11 +258,11 @@ function App() {
     setLoadingMessage("Kundenprofil wird gespeichert...");
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (!user) throw new Error('No user found');
+      if (!user) {
+        throw new Error('Sie müssen angemeldet sein, um ein Kundenprofil zu speichern');
+      }
 
       let styleAnalysis = formData.style_analysis;
 
@@ -282,6 +290,17 @@ function App() {
       };
 
       if (isEditing) {
+        // Zusätzliche Sicherheitsüberprüfung für das Bearbeiten
+        const { data: existingCustomer } = await supabase
+          .from('customers')
+          .select('user_id')
+          .eq('id', isEditing)
+          .single();
+
+        if (!existingCustomer || existingCustomer.user_id !== user.id) {
+          throw new Error('Sie haben keine Berechtigung, dieses Kundenprofil zu bearbeiten');
+        }
+
         const { error } = await supabase
           .from('customers')
           .update(customerData)
@@ -302,8 +321,7 @@ function App() {
       setIsEditing(null);
     } catch (error: any) {
       console.error('Error saving customer:', error);
-      // Hier könnte man noch eine Fehlermeldung für den Benutzer anzeigen
-      alert(error.message || 'Ein Fehler ist aufgetreten beim Speichern des Kundenprofils');
+      setFormErrors([error.message || 'Ein Fehler ist aufgetreten beim Speichern des Kundenprofils']);
     } finally {
       setIsLoading(false);
     }
@@ -318,11 +336,22 @@ function App() {
     if (!customerToDelete) return;
 
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (!user) throw new Error('No user found');
+      if (!user) {
+        throw new Error('Sie müssen angemeldet sein, um ein Kundenprofil zu löschen');
+      }
+
+      // Zusätzliche Sicherheitsüberprüfung für das Löschen
+      const { data: existingCustomer } = await supabase
+        .from('customers')
+        .select('user_id')
+        .eq('id', customerToDelete)
+        .single();
+
+      if (!existingCustomer || existingCustomer.user_id !== user.id) {
+        throw new Error('Sie haben keine Berechtigung, dieses Kundenprofil zu löschen');
+      }
 
       const { error } = await supabase
         .from('customers')
@@ -335,8 +364,9 @@ function App() {
       await fetchCustomers();
       setShowDeleteModal(false);
       setCustomerToDelete(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting customer:', error);
+      alert(error.message || 'Ein Fehler ist aufgetreten beim Löschen des Kundenprofils');
     }
   };
 
@@ -420,7 +450,7 @@ ${linkedInPost}`
             }
           }
         },
-        reasoning_effort: "medium"
+        reasoning_effort: "high"
       });
 
       const result = response.choices[0].message.content;
