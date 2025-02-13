@@ -393,7 +393,8 @@ function App() {
             "content": [
               {
                 "type": "text",
-                "text": "Du bist ein hilfreicher KI-Assistent, der den folgenden gelieferten Text analysiert und dann aus der Perspektive des Kundenprofils drei Kommentare für den mitglieferten LinkedIn Beitrag schreibt. Diese sollen exakt so klingen, wie die Stilanalyse vorschreibt. Außerdem sollen die Kommentare, ohne werblich zu sein, den Lesenden für die Person hinter dem Kundenprofil neugierig machen. Verwende immer die Ansprache des mitgeschickten LinkedIn Posts. 2 kurze Sätze sind das Maximum pro Kommentar. Die Kommentare müssen so unvollkommen sein, wie die von Menschen. Die Kommentare müssen maximal nahbar sein.  "
+                "text": "Du bist ein LinkedIn Content Creator, der für den mitgelieferten Text 6 Kommentare schreibt. Diese müssen die folgenden Regeln einhalten: 1. kurz und bündig (maximal 1-2 Sätze) 2. Der Kommentar muss den Turing Test bestehen. 3. Er darf nicht werblich klingen oder gängige Marketingphrasen enthalten. 4. Der Kommentar darf sich selbst nicht ganz so ernst nehmen. 5. Jeweils 2 Kommentare sollten positiv, neutral und negativ sein. 6. Der Kommentar muss klingen, wie Menschen sprechen. Nicht wie Menschen schreiben. 7. Eine konkrete Satzstruktur muss nicht beachtet werden"
+
               }
             ]
           },
