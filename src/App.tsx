@@ -22,6 +22,7 @@ interface Customer {
 interface GeneratedComment {
   id: number;
   text: string;
+  sentiment: 'positive' | 'neutral' | 'negative';
 }
 
 interface CustomerFormData {
@@ -199,7 +200,7 @@ function App() {
   const generateStyleAnalysis = async (examples: string[]): Promise<string> => {
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-4.5-preview",
+        model: "o3-mini-2025-01-31",
         messages: [
           {
             "role": "developer",
@@ -386,14 +387,14 @@ function App() {
 
     try {
       const response = await openai.chat.completions.create({
-        model: "o3-mini-2025-01-31",
+        model: "gpt-4.5-preview",
         messages: [
           {
-            "role": "developer",
+            "role": "system",
             "content": [
               {
                 "type": "text",
-                "text": "Du bist ein LinkedIn Content Creator, der für den mitgelieferten Text 6 Kommentare schreibt. Diese müssen die folgenden Regeln einhalten: 1. kurz und bündig (maximal 1-2 Sätze) 2. Der Kommentar muss den Turing Test bestehen. 3. Er darf nicht werblich klingen oder gängige Marketingphrasen enthalten. 4. Der Kommentar darf sich selbst nicht ganz so ernst nehmen. 5. Jeweils 2 Kommentare sollten positiv, neutral und negativ sein. 6. Der Kommentar muss klingen, wie Menschen sprechen. Nicht wie Menschen schreiben. 7. Eine konkrete Satzstruktur muss nicht beachtet werden"
+                "text": "Du bist ein LinkedIn Content Creator, der für den mitgelieferten Text 6 Kommentare schreibt. Diese müssen die folgenden Regeln einhalten: 1. kurz und bündig (maximal 1-2 Sätze) 2. Der Kommentar muss den Turing Test bestehen. 3. Er darf nicht werblich klingen oder gängige Marketingphrasen enthalten. 4. Der Kommentar darf sich selbst nicht ganz so ernst nehmen. 5. Jeweils 2 Kommentare sollten positiv, neutral und negativ sein. 6. Der Kommentar muss klingen, wie Menschen sprechen. Nicht wie Menschen schreiben. 7. Eine konkrete Satzstruktur muss nicht beachtet werden. 8. Lasse den Kommentar so klingen, wie die Stilanalyse sagt."
 
               }
             ]
@@ -450,8 +451,7 @@ ${linkedInPost}`
               "additionalProperties": false
             }
           }
-        },
-        reasoning_effort: "high"
+        }
       });
 
       const result = response.choices[0].message.content;
@@ -464,10 +464,26 @@ ${linkedInPost}`
         }>;
       };
 
-      setGeneratedComments(parsedResult.comments.map((comment, index: number) => ({
-        id: index + 1,
-        text: comment.content
-      })));
+      setGeneratedComments(parsedResult.comments.map((comment, index: number) => {
+        // Determine sentiment based on comment position
+        let sentiment: 'positive' | 'neutral' | 'negative';
+        if (index < 2) {
+          // First two comments - positive
+          sentiment = 'positive';
+        } else if (index < 4) {
+          // Middle two comments - neutral
+          sentiment = 'neutral';
+        } else {
+          // Last two comments - negative
+          sentiment = 'negative';
+        }
+        
+        return {
+          id: index + 1,
+          text: comment.content,
+          sentiment
+        };
+      }));
     } catch (error) {
       console.error('Error generating comments:', error);
       // Optional: Add error handling UI here
@@ -697,7 +713,15 @@ ${linkedInPost}`
                   <div key={comment.id} className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3 flex-1">
-                        <p className="text-sm text-gray-700">{comment.text}</p>
+                        <p className={`text-sm p-2 rounded ${
+                          comment.sentiment === 'positive' 
+                            ? 'bg-green-100 text-green-800' 
+                            : comment.sentiment === 'neutral'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}>
+                          {comment.text}
+                        </p>
                       </div>
                       <button
                         onClick={() => copyToClipboard(comment.text, comment.id)}
