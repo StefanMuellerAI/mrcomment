@@ -199,7 +199,7 @@ function App() {
   const generateStyleAnalysis = async (examples: string[]): Promise<string> => {
     try {
       const response = await openai.chat.completions.create({
-        model: "o3-mini-2025-01-31",
+        model: "gpt-4.5-preview",
         messages: [
           {
             "role": "developer",
