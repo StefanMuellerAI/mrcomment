@@ -1,13 +1,17 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface LegalModalProps {
   title: string;
-  content: React.ReactNode;
+  content: React.ReactNode | string;
   onClose: () => void;
 }
 
 const LegalModal: React.FC<LegalModalProps> = ({ title, content, onClose }) => {
+  // Prüfen, ob der Inhalt ein String oder ReactNode ist
+  const isMarkdownContent = typeof content === 'string';
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -22,7 +26,13 @@ const LegalModal: React.FC<LegalModalProps> = ({ title, content, onClose }) => {
             </button>
           </div>
           <div className="prose prose-sm max-w-none">
-            {content}
+            {isMarkdownContent ? (
+              // Wenn es sich um Markdown-Text handelt, rendern wir ihn mit ReactMarkdown
+              <ReactMarkdown>{content as string}</ReactMarkdown>
+            ) : (
+              // Andernfalls geben wir den ReactNode direkt aus
+              content
+            )}
           </div>
         </div>
       </div>
