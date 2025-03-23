@@ -46,23 +46,56 @@ const API_KEY = import.meta.env.VITE_RESEARCH_API_KEY;
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-    ...(API_KEY ? { 'X-API-Key': API_KEY } : {})
+    'Content-Type': 'application/json'
   }
 });
+
+// Request-Interceptor, der den API-Key zu jeder Anfrage hinzufügt
+api.interceptors.request.use(
+  (config) => {
+    // API-Key zu jeder Anfrage hinzufügen, wenn in der Umgebung verfügbar
+    if (API_KEY) {
+      config.headers['X-API-Key'] = API_KEY;
+      console.log('Added API key to request headers');
+    } else {
+      console.log('No API key found in environment variables');
+      // In der lokalen Entwicklung wird der Key vom Proxy hinzugefügt
+    }
+    
+    // Debugging-Info (nur in Entwicklung)
+    if (import.meta.env.DEV) {
+      console.log(`Sending request to: ${config.baseURL}${config.url}`);
+      console.log('Headers:', JSON.stringify(config.headers));
+    }
+    
+    return config;
+  },
+  (error) => {
+    console.error('Error in request interceptor:', error);
+    return Promise.reject(error);
+  }
+);
 
 /**
  * Starts a new trend research analysis
  */
 export const startTrendResearch = async (topic: string): Promise<TrendResearchResponse> => {
   try {
+    console.log('Starting trend research for topic:', topic);
     const response = await api.post('/research', {
       query: topic,
       mode: 'trends'
     });
+    console.log('Research started successfully');
     return response.data;
   } catch (error) {
     console.error('Error starting trend research:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Status code:', error.response?.status);
+      if (error.response?.status === 401) {
+        throw new Error('Fehler bei der Authentifizierung. API-Key möglicherweise ungültig oder fehlt.');
+      }
+    }
     throw new Error('Fehler beim Starten der Trendanalyse');
   }
 };

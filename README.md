@@ -33,7 +33,7 @@ Die Anwendung ist für das Deployment auf Vercel konfiguriert. Dabei wird:
 
 ### API-Key in Vercel konfigurieren
 
-Du musst den API-Key in deinen Vercel-Umgebungsvariablen eintragen:
+**WICHTIG**: Für das korrekte Funktionieren der API-Anfragen in der Produktion musst du den API-Key in deinen Vercel-Umgebungsvariablen eintragen:
 
 1. Gehe zum Dashboard deines Vercel-Projekts
 2. Navigiere zu "Settings" > "Environment Variables"
@@ -41,6 +41,16 @@ Du musst den API-Key in deinen Vercel-Umgebungsvariablen eintragen:
    - Name: `VITE_RESEARCH_API_KEY`
    - Wert: Dein Research API Key
    - Environments: Production
+
+Ohne diese Umgebungsvariable werden API-Anfragen mit einem 401 Unauthorized-Fehler fehlschlagen.
+
+## Fehlerbehandlung
+
+Wenn du nach dem Deployment 401-Fehler bei API-Anfragen erhältst:
+
+1. Überprüfe, ob die Umgebungsvariable `VITE_RESEARCH_API_KEY` in Vercel korrekt gesetzt ist
+2. Stelle sicher, dass der API-Key gültig ist
+3. Überprüfe die Browser-Konsole auf Fehler bei der API-Kommunikation
 
 ## Umgebungsvariablen
 
@@ -51,7 +61,7 @@ Folgende Umgebungsvariablen werden benötigt:
 - `RESEARCH_API_KEY`: API-Key für die Research-API
 
 **Produktion (Vercel):**
-- `VITE_RESEARCH_API_KEY`: API-Key für die Research-API
+- `VITE_RESEARCH_API_KEY`: API-Key für die Research-API (MUSS in Vercel gesetzt werden)
 
 ## Lokaler Entwicklungsprozess
 
