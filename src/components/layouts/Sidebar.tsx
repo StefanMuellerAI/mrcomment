@@ -45,36 +45,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, isCollapsed, toggleCollapsed
           {!isCollapsed && <span>Kommentar-Tool</span>}
         </NavLink>
         
-        <div className="relative">
-          <NavLink 
-            to="/ideen-tool" 
-            className={({ isActive }) => 
-              `flex items-center rounded-md text-sm font-medium ${
-                isCollapsed ? 'justify-center py-3 px-2' : 'px-4 py-3'
-              } ${
-                isActive 
-                  ? 'bg-blue-50 text-blue-700' 
-                  : 'text-gray-700 hover:bg-gray-100'
-              }`
-            }
-            title="Ideen-Tool"
-          >
-            <Lightbulb className={`h-5 w-5 ${!isCollapsed && 'mr-3'}`} />
-            {!isCollapsed && (
-              <>
-                <span>Ideen-Tool</span>
-                <span className="ml-auto bg-gray-200 text-gray-500 text-xs px-2 py-0.5 rounded-full">
-                  Soon
-                </span>
-              </>
-            )}
-          </NavLink>
-          {isCollapsed && (
-            <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-200 text-gray-500 text-xs px-2 py-0.5 rounded-full whitespace-nowrap z-10">
-              Soon
-            </div>
-          )}
-        </div>
+        <NavLink 
+          to="/ideen-tool" 
+          className={({ isActive }) => 
+            `flex items-center rounded-md text-sm font-medium ${
+              isCollapsed ? 'justify-center py-3 px-2' : 'px-4 py-3'
+            } ${
+              isActive 
+                ? 'bg-blue-50 text-blue-700' 
+                : 'text-gray-700 hover:bg-gray-100'
+            }`
+          }
+          title="Ideen-Tool"
+        >
+          <Lightbulb className={`h-5 w-5 ${!isCollapsed && 'mr-3'}`} />
+          {!isCollapsed && <span>Ideen-Tool</span>}
+        </NavLink>
         
         <div className="relative">
           <NavLink 
