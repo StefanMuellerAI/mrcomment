@@ -38,12 +38,16 @@ export interface TrendsResponse {
 // In der Produktionsumgebung leitet Vercel Anfragen direkt weiter
 const API_BASE_URL = '/api';
 
-// API-Key wird nur im Produktionsmodus von Vercel benötigt
-// und über die Vercel-Konfiguration weitergeleitet
+// API-Key aus der Umgebung holen, falls verfügbar (für Vercel-Umgebung)
+// In der lokalen Entwicklung wird der API-Key vom Proxy-Server hinzugefügt
+const API_KEY = import.meta.env.VITE_RESEARCH_API_KEY;
+
+// API Client konfigurieren
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    ...(API_KEY ? { 'X-API-Key': API_KEY } : {})
   }
 });
 

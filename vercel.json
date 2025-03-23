@@ -7,11 +7,23 @@
   "rewrites": [
     {
       "source": "/api/research",
-      "destination": "https://researchapi.stefanai.de/research"
+      "destination": "https://researchapi.stefanai.de/research",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-api-key"
+        }
+      ]
     },
     {
       "source": "/api/research/:path*",
-      "destination": "https://researchapi.stefanai.de/research/:path*"
+      "destination": "https://researchapi.stefanai.de/research/:path*",
+      "has": [
+        {
+          "type": "header",
+          "key": "x-api-key"
+        }
+      ]
     }
   ],
   "headers": [
@@ -24,5 +36,8 @@
         { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-API-Key" }
       ]
     }
-  ]
+  ],
+  "env": {
+    "X_API_KEY": "@research_api_key"
+  }
 } 

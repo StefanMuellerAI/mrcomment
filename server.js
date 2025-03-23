@@ -29,6 +29,9 @@ if (!RESEARCH_API_KEY) {
 // Proxy for starting research
 app.post('/api/research', async (req, res) => {
   try {
+    console.log(`Forwarding POST request to ${RESEARCH_API_URL}/research`);
+    console.log('API Key configured:', !!RESEARCH_API_KEY);
+    
     const response = await axios.post(`${RESEARCH_API_URL}/research`, req.body, {
       headers: {
         'Content-Type': 'application/json',
@@ -38,6 +41,10 @@ app.post('/api/research', async (req, res) => {
     res.json(response.data);
   } catch (error) {
     console.error('Error proxying research request:', error.message);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
     res.status(error.response?.status || 500).json({
       error: error.message,
       details: error.response?.data || 'Internal Server Error'
