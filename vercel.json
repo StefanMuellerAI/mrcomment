@@ -12,6 +12,10 @@
     {
       "source": "/api/research/:path*",
       "destination": "https://researchapi.stefanai.de/research/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
