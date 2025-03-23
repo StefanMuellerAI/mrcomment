@@ -9,6 +9,7 @@ export interface AdminUser {
   role: string;
   customer_count: number;
   weekly_generations_used: number;
+  available_generations: number;
   plan: {
     id: number;
     name: string;
@@ -139,9 +140,14 @@ const UserTable: React.FC<UserTableProps> = ({
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span className={user.weekly_generations_used >= user.plan.weekly_generations ? 'text-red-600 font-semibold' : ''}>
-                  {user.weekly_generations_used}/{user.plan.weekly_generations}
+                <span className={user.weekly_generations_used >= user.available_generations ? 'text-red-600 font-semibold' : ''}>
+                  {user.weekly_generations_used}/{user.available_generations}
                 </span>
+                {user.available_generations < user.plan.weekly_generations && (
+                  <span className="ml-2 text-xs text-blue-600 bg-blue-100 py-0.5 px-1.5 rounded-full">
+                    Limit pro Kunde
+                  </span>
+                )}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
                 <div className="flex items-center space-x-4">

@@ -137,6 +137,31 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Funktion zum Abrufen der verfügbaren Generierungen eines Benutzers basierend auf Kundenzahl
+  const getUserAvailableGenerations = async (userId: string, customerCount: number, plan: any) => {
+    try {
+      // Berechne verfügbare Generierungen basierend auf Kundenzahl
+      // Jeder Kunde erhält einen proportionalen Anteil der Generierungen
+      const generationsPerCustomer = Math.floor(plan.weekly_generations / plan.max_customers);
+      
+      // Anzahl der tatsächlich angelegten Kunden (max. Planlimit)
+      const effectiveCustomerCount = Math.min(customerCount, plan.max_customers);
+      
+      // Berechne verfügbare Generierungen
+      // Mindestens 1 Kunde, um Division durch Null zu vermeiden
+      const actualCustomerCount = Math.max(effectiveCustomerCount, 1);
+      const availableGenerations = Math.min(
+        generationsPerCustomer * actualCustomerCount,
+        plan.weekly_generations
+      );
+      
+      return availableGenerations;
+    } catch (err) {
+      console.error('Error calculating available generations:', err);
+      return plan.weekly_generations; // Fallback auf Gesamtlimit
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -199,6 +224,13 @@ const AdminDashboard: React.FC = () => {
           // Echte Abrufzahlen für die wöchentlichen Generierungen
           const weeklyGenerationsUsed = await getUserGenerations(userData.id);
           
+          // Berechne verfügbare Generierungen basierend auf Anzahl der Kunden
+          const availableGenerations = await getUserAvailableGenerations(
+            userData.id, 
+            customerCount, 
+            userPlan || { id: 1, name: 'S', max_customers: 10, weekly_generations: 300 }
+          );
+          
           return {
             id: userData.id,
             email: userData.email,
@@ -206,6 +238,7 @@ const AdminDashboard: React.FC = () => {
             role: role,
             customer_count: customerCount,
             weekly_generations_used: weeklyGenerationsUsed,
+            available_generations: availableGenerations,
             plan: userPlan || { id: 1, name: 'S', max_customers: 10, weekly_generations: 300 } // Default to Plan S if no plan found
           };
         })
@@ -244,11 +277,24 @@ const AdminDashboard: React.FC = () => {
         
       if (planError) throw planError;
       
-      // Aktualisiere die Benutzerinformationen in der lokalen Liste mit allen relevanten Plan-Eigenschaften
+      // Aktualisiere die Benutzerinformationen in der lokalen Liste
       setUsers(users.map(user => {
         if (user.id === userId) {
+          // Aktuelle Kundenzahl des Benutzers
+          const customerCount = user.customer_count;
+          
+          // Berechne die neuen verfügbaren Generierungen basierend auf der Kundenzahl
+          const generationsPerCustomer = Math.floor(planData.weekly_generations / planData.max_customers);
+          const effectiveCustomerCount = Math.min(customerCount, planData.max_customers);
+          const actualCustomerCount = Math.max(effectiveCustomerCount, 1);
+          const availableGenerations = Math.min(
+            generationsPerCustomer * actualCustomerCount,
+            planData.weekly_generations
+          );
+          
           return {
             ...user,
+            available_generations: availableGenerations,
             plan: {
               id: planData.id,
               name: planData.name,

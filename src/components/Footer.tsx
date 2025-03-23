@@ -7,8 +7,8 @@ interface FooterProps {
 
 const Footer: React.FC<FooterProps> = ({ onShowImpressum, onShowDatenschutz }) => {
   return (
-    <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 py-4">
+    <footer className="bg-white border-t border-gray-200 mt-auto w-full z-10 relative">
+      <div className="w-full px-6 py-4">
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-500">
             © {new Date().getFullYear()} Mr. Comment
