@@ -6,7 +6,7 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ className = '' }) => {
   return (
-    <img src="/public/images/mrcommentlogo.png" alt="Logo" className={className} />
+    <img src="../images/MrCommentLogo.png" alt="Logo" className={className} />
   );
 };
 
