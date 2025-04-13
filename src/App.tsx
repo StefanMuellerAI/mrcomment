@@ -111,13 +111,10 @@ function App() {
             />
             
             <Route 
-              path="/ideen-tool" 
+              path="/hook-tool"
               element={
                 <ToolPageLayout>
-                  <IdeenToolPage 
-                    userEmail={userEmail} 
-                    isAdmin={isAdmin} 
-                  />
+                  <IdeenToolPage />
                 </ToolPageLayout>
               } 
             />

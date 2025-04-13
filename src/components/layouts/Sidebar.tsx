@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Lightbulb, Search, PenTool, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MessageSquare, Anchor, Search, PenTool, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 interface SidebarProps {
@@ -46,7 +46,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, isCollapsed, toggleCollapsed
         </NavLink>
         
         <NavLink 
-          to="/ideen-tool" 
+          to="/hook-tool"
           className={({ isActive }) => 
             `flex items-center rounded-md text-sm font-medium ${
               isCollapsed ? 'justify-center py-3 px-2' : 'px-4 py-3'
@@ -56,10 +56,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isAdmin, isCollapsed, toggleCollapsed
                 : 'text-gray-700 hover:bg-gray-100'
             }`
           }
-          title="Ideen-Tool"
+          title="Hook Tool"
         >
-          <Lightbulb className={`h-5 w-5 ${!isCollapsed && 'mr-3'}`} />
-          {!isCollapsed && <span>Ideen-Tool</span>}
+          <Anchor className={`h-5 w-5 ${!isCollapsed && 'mr-3'}`} />
+          {!isCollapsed && <span>Hook-Tool</span>}
         </NavLink>
         
         <div className="relative">
