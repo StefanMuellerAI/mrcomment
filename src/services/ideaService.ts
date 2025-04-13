@@ -38,7 +38,7 @@ export const generateLinkedInHook = async (keyPhrase: string): Promise<GenerateH
       { key_phrase: keyPhrase },
       {
         headers: {
-          'access_token': LINKEDIN_HOOK_API_KEY // Authentifizierungs-Header
+          'X-API-Key': LINKEDIN_HOOK_API_KEY // Authentifizierungs-Header
         }
       }
     );
