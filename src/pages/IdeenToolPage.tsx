@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lightbulb, Search, Loader2, Send } from 'lucide-react';
+import { Lightbulb, Search, Loader2, Send, ClipboardCopy, Check } from 'lucide-react';
 import {
   generateLinkedInHook,
   GenerateHookResponse
@@ -16,6 +16,7 @@ const IdeenToolPage: React.FC = () => {
   const [generatedHooks, setGeneratedHooks] = useState<GenerateHookResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   // Entferne den useEffect Hook für das Polling
 
@@ -37,6 +38,20 @@ const IdeenToolPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Funktion zum Kopieren in die Zwischenablage
+  const handleCopyToClipboard = (textToCopy: string, index: number) => {
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => {
+        setCopiedIndex(index); // Speichere den Index des kopierten Elements
+        // Setze den Index nach kurzer Zeit zurück, um den "Kopiert"-Zustand zu beenden
+        setTimeout(() => setCopiedIndex(null), 1500);
+      })
+      .catch(err => {
+        console.error('Fehler beim Kopieren in die Zwischenablage:', err);
+        // Optional: Fehler dem Benutzer anzeigen
+      });
   };
 
   return (
@@ -115,11 +130,23 @@ const IdeenToolPage: React.FC = () => {
             <h2 className="text-xl font-semibold mb-4">
               Generierte Hooks für "{generatedHooks.key_phrase}":
             </h2>
-            <ul className="list-disc pl-5 space-y-2">
+            <ul className="space-y-2">
               {generatedHooks.hooks.map((hook, index) => (
-                <li key={index} className="text-gray-700 bg-gray-50 p-3 rounded">
-                  {hook}
-                  {/* Hier könnte später ein Button zum Kopieren/Verwenden hinzukommen */}
+                <li key={index} className="bg-gray-50 p-3 rounded flex justify-between items-center gap-3">
+                  <span className="text-gray-700 flex-grow">{hook}</span>
+                  <button
+                    onClick={() => handleCopyToClipboard(hook, index)}
+                    className={`p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 transition-colors duration-150 ${
+                      copiedIndex === index ? 'text-green-600 hover:text-green-700' : ''
+                    }`}
+                    title="In die Zwischenablage kopieren"
+                  >
+                    {copiedIndex === index ? (
+                      <Check className="h-5 w-5" />
+                    ) : (
+                      <ClipboardCopy className="h-5 w-5" />
+                    )}
+                  </button>
                 </li>
               ))}
             </ul>
