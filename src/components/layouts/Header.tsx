@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({
       <div className="w-full px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <Logo className="h-8 w-auto" />
-          <span className="ml-3 text-xl font-medium text-gray-900">Toolbox</span>
+          <span className="ml-3 text-xl font-medium text-gray-900">MrComment</span>
         </div>
         
         <div className="flex items-center">
