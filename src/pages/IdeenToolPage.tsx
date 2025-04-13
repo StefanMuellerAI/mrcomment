@@ -1,87 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { Lightbulb, Search, Loader2, TrendingUp, CheckCircle } from 'lucide-react';
-import { 
-  startTrendResearch, 
-  getResearchStatus, 
-  getTrendResults,
-  TrendItem
-} from '../services/ideaService';
+import React, { useState } from 'react';
+import { Lightbulb, Search, Loader2, Send } from 'lucide-react';
+import {
+  generateLinkedInHook,
+  GenerateHookResponse
+} from '../services/ideaService'; // Importiere nur noch die Hook-Funktion
 
-interface IdeenToolPageProps {
-  userEmail?: string;
-  isAdmin?: boolean;
-}
+// Kein UserEmail/isAdmin mehr nötig, falls nicht anderswo verwendet
+// interface IdeenToolPageProps {
+//   userEmail?: string;
+//   isAdmin?: boolean;
+// }
 
-const IdeenToolPage: React.FC<IdeenToolPageProps> = () => {
-  const [topic, setTopic] = useState<string>('');
-  const [researchId, setResearchId] = useState<string | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
-  const [progress, setProgress] = useState<number>(0);
-  const [progressMessage, setProgressMessage] = useState<string>('');
-  const [summary, setSummary] = useState<string | null>(null);
-  const [trends, setTrends] = useState<TrendItem[] | null>(null);
+const IdeenToolPage: React.FC = () => {
+  const [keyPhrase, setKeyPhrase] = useState<string>('');
+  const [generatedHooks, setGeneratedHooks] = useState<GenerateHookResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Poll for status updates when there's an active research
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (researchId && status && status !== 'completed' && status !== 'failed') {
-      interval = setInterval(async () => {
-        try {
-          const statusResponse = await getResearchStatus(researchId);
-          setStatus(statusResponse.status);
-          setProgress(statusResponse.progress);
-          setProgressMessage(statusResponse.progress_message);
-          
-          // If the research is completed, fetch the results
-          if (statusResponse.status === 'completed') {
-            const results = await getTrendResults(researchId);
-            setSummary(results.summary);
-            setTrends(results.trends);
-            clearInterval(interval);
-          }
-          
-          // Handle failure
-          if (statusResponse.status === 'failed') {
-            setError('Die Trendanalyse konnte nicht abgeschlossen werden.');
-            clearInterval(interval);
-          }
-        } catch (err) {
-          console.error('Error polling status:', err);
-          setError('Fehler beim Abrufen des Recherche-Status.');
-          clearInterval(interval);
-        }
-      }, 5000); // Poll every 5 seconds
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [researchId, status]);
+  // Entferne den useEffect Hook für das Polling
 
-  // Handle form submission
+  // Angepasste Handle-Submit Funktion
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!topic.trim()) return;
-    
+    if (!keyPhrase.trim()) return;
+
     setIsLoading(true);
     setError(null);
-    setResearchId(null);
-    setStatus(null);
-    setProgress(0);
-    setProgressMessage('');
-    setSummary(null);
-    setTrends(null);
-    
+    setGeneratedHooks(null); // Hake zurücksetzen
+
     try {
-      const response = await startTrendResearch(topic);
-      setResearchId(response.research_id);
-      setStatus(response.status);
-    } catch (err) {
-      console.error('Error starting research:', err);
-      setError('Fehler beim Starten der Trendanalyse.');
+      const response = await generateLinkedInHook(keyPhrase);
+      setGeneratedHooks(response);
+    } catch (err: any) {
+      console.error('Fehler beim Generieren der Hooks:', err);
+      setError(err.message || 'Ein unbekannter Fehler ist aufgetreten.');
     } finally {
       setIsLoading(false);
     }
@@ -92,19 +44,19 @@ const IdeenToolPage: React.FC<IdeenToolPageProps> = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold mb-4 flex items-center">
           <Lightbulb className="mr-2 text-yellow-500" />
-          Ideen-Tool
+          LinkedIn Hook Generator
         </h1>
-        
+
         <p className="text-gray-700 mb-6">
-          Mit dem Ideen-Tool können Sie aktuelle Trends zu Ihrem Thema analysieren und daraus Inspiration für neue Content-Ideen gewinnen.
+          Geben Sie ein Stichwort oder Thema ein, um automatisch catchy Hook-Ideen für Ihre nächsten LinkedIn-Posts zu generieren.
         </p>
-        
-        {/* Search form */}
+
+        {/* Suchformular für Hooks */}
         <form onSubmit={handleSubmit} className="mt-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-grow">
-              <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-1">
-                Thema für die Trendanalyse
+              <label htmlFor="keyPhrase" className="block text-sm font-medium text-gray-700 mb-1">
+                Stichwort / Thema
               </label>
               <div className="relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -112,100 +64,77 @@ const IdeenToolPage: React.FC<IdeenToolPageProps> = () => {
                 </div>
                 <input
                   type="text"
-                  id="topic"
+                  id="keyPhrase"
                   className="block w-full pl-10 pr-12 py-2 sm:text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="z.B. Nachhaltige Mode, KI im Marketing, ..."
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  disabled={isLoading || status === 'processing' || status === 'searching'}
+                  placeholder="z.B. KI im Marketing, Führungskompetenz, ..."
+                  value={keyPhrase}
+                  onChange={(e) => setKeyPhrase(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
             </div>
             <div className="flex items-end">
               <button
                 type="submit"
-                className={`px-4 py-2 rounded-md text-white font-medium ${
-                  isLoading || status === 'processing' || status === 'searching'
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-                disabled={isLoading || status === 'processing' || status === 'searching' || !topic.trim()}
+                className={`px-4 py-2 rounded-md text-white font-medium flex items-center gap-2 ${isLoading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                disabled={isLoading || !keyPhrase.trim()}
               >
                 {isLoading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Generiere...
+                  </>
                 ) : (
-                  'Trends analysieren'
+                  <>
+                    <Send className="h-5 w-5" />
+                    Hooks generieren
+                  </>
                 )}
               </button>
             </div>
           </div>
         </form>
-        
-        {/* Progress and status */}
-        {status && status !== 'completed' && (
-          <div className="mb-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <div className="flex items-center mb-2">
-              <Loader2 className="h-5 w-5 text-blue-500 animate-spin mr-2" />
-              <p className="text-blue-700 font-medium">
-                {progressMessage || 'Trendanalyse läuft...'}
-              </p>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
-              <div 
-                className="bg-blue-600 h-2.5 rounded-full" 
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
-        
-        {/* Error message */}
+
+        {/* Ladezustand - optional, da im Button integriert */}
+        {/* {isLoading && (...)} */}
+
+        {/* Fehlermeldung */}
         {error && (
           <div className="mb-8 p-4 bg-red-50 rounded-lg border border-red-100">
-            <p className="text-red-700">{error}</p>
+            <p className="text-red-700 font-semibold">Fehler</p>
+            <p className="text-red-600 mt-1">{error}</p>
           </div>
         )}
-        
-        {/* Results */}
-        {status === 'completed' && summary && trends && (
+
+        {/* Ergebnisse (Hooks) */}
+        {generatedHooks && generatedHooks.hooks.length > 0 && (
           <div className="mb-8">
-            <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-100">
-              <div className="flex items-center mb-2">
-                <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                <p className="text-green-700 font-medium">Trendanalyse abgeschlossen</p>
-              </div>
-            </div>
-            
-            <h2 className="text-xl font-semibold mb-4">Zusammenfassung</h2>
-            <p className="text-gray-700 mb-6">{summary}</p>
-            
-            <h2 className="text-xl font-semibold mb-4 flex items-center">
-              <TrendingUp className="mr-2 text-blue-500" />
-              Erkannte Trends
+            <h2 className="text-xl font-semibold mb-4">
+              Generierte Hooks für "{generatedHooks.key_phrase}":
             </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {trends.map((trend, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                  <h3 className="font-medium text-lg mb-2">{trend.title}</h3>
-                  <p className="text-gray-600">{trend.description}</p>
-                </div>
+            <ul className="list-disc pl-5 space-y-2">
+              {generatedHooks.hooks.map((hook, index) => (
+                <li key={index} className="text-gray-700 bg-gray-50 p-3 rounded">
+                  {hook}
+                  {/* Hier könnte später ein Button zum Kopieren/Verwenden hinzukommen */}
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
-        
-        {/* Informative text when no search is active */}
-        {!status && (
-          <div className="mt-8 p-5 bg-gray-50 rounded-lg border border-gray-100">
-            <h3 className="font-medium text-lg mb-3">So funktioniert die Trendanalyse:</h3>
-            <ol className="list-decimal pl-5 space-y-2 text-gray-700">
-              <li>Geben Sie ein Thema ein, zu dem Sie Content erstellen möchten</li>
-              <li>Unsere KI durchsucht aktuelle Quellen und analysiert relevante Trends</li>
-              <li>Sie erhalten eine detaillierte Übersicht über aktuelle Entwicklungen und Themen</li>
-              <li>Nutzen Sie die identifizierten Trends als Inspiration für Ihre Content-Erstellung</li>
-              <li>Entwickeln Sie auf Basis der Trends neue, relevante Inhalte für Ihre Zielgruppe</li>
-            </ol>
+        {generatedHooks && generatedHooks.hooks.length === 0 && (
+           <div className="mb-8 p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+            <p className="text-yellow-700">Für "{generatedHooks.key_phrase}" konnten keine Hooks generiert werden.</p>
+          </div>
+        )}
+
+        {/* Info-Text, wenn noch nichts generiert wurde */}
+        {!isLoading && !generatedHooks && !error && (
+          <div className="mt-8 p-5 bg-gray-50 rounded-lg border border-gray-100 text-center">
+            <p className="text-gray-600">Geben Sie ein Thema ein, um zu starten.</p>
           </div>
         )}
       </div>

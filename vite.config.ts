@@ -9,9 +9,15 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
+      '/api/generate-hook': {
+        target: 'http://0.0.0.0:8000',
         changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/generate-hook/, '/generate-hook'),
+      },
+      '/api/health': {
+        target: 'http://0.0.0.0:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/health/, '/health'),
       }
     }
   }
