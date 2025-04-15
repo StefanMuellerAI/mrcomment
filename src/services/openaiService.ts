@@ -57,7 +57,7 @@ export const generateStyleAnalysis = async (examples: string[]): Promise<string>
 export const generateComments = async (customerName: string, styleAnalysis: string, linkedInPost: string): Promise<GeneratedComment[]> => {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4.5-preview",
+      model: "gpt-4.1",
       messages: [
         {
           "role": "system",
