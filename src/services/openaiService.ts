@@ -17,7 +17,7 @@ const openai = new OpenAI({
 export const generateStyleAnalysis = async (examples: string[]): Promise<string> => {
   try {
     const response = await openai.chat.completions.create({
-      model: "o3-mini-2025-01-31",
+      model: "o4-mini",
       messages: [
         {
           "role": "developer",
@@ -57,7 +57,7 @@ export const generateStyleAnalysis = async (examples: string[]): Promise<string>
 export const generateComments = async (customerName: string, styleAnalysis: string, linkedInPost: string): Promise<GeneratedComment[]> => {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4.1",
+      model: "o4-mini",
       messages: [
         {
           "role": "system",
